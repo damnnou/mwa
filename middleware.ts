@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-const ALLOWED_ORIGIN = process.env.NEXT_PUBLIC_APP_URL;
+const ALLOWED_ORIGIN = process.env.NEXT_PUBLIC_APP_URL!;
 
 export function middleware(req: NextRequest) {
     const origin = req.headers.get("origin");
