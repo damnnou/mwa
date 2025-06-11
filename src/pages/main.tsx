@@ -6,7 +6,7 @@ import { useMemo, useState } from "react";
 import { cn } from "~/lib/utils";
 
 export default function MainPage() {
-    const { data } = useWaitlistData();
+    const { data, isLoading } = useWaitlistData();
 
     const { total, last24h, last24hChange, last7d, last7dChange } = useMemo(() => {
         if (!data) {
@@ -67,6 +67,18 @@ export default function MainPage() {
 
         return sorted;
     }, [data, walletFilter, sortOrder]);
+
+    if (isLoading)
+        return (
+            <div className="flex flex-col items-center mx-auto max-w-[1024px] w-full h-full">
+                <Header />
+                <div className="flex flex-col mt-12 items-center w-full">
+                    <div className="flex flex-col gap-2 items-center bg-white w-full rounded-2xl p-4 shadow-xl">
+                        <h3>Loading...</h3>
+                    </div>
+                </div>
+            </div>
+        );
 
     return (
         <div className="flex flex-col items-center mx-auto max-w-[1024px] w-full h-full">
