@@ -11,11 +11,9 @@ type RawUser = {
 
 type ParsedUser = Omit<RawUser, "joined_at"> & { joined_at: Date };
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL!;
-
 export function useWaitlistData() {
     const { data, isLoading } = useSWR<RawUser[]>(["waitlistData"], async () => {
-        const { data } = await axios.get(`${API_URL}/waitlist`);
+        const { data } = await axios.get(`api/waitlist`);
         return data;
     });
 
