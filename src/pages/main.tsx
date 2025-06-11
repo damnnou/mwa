@@ -142,7 +142,7 @@ export default function MainPage() {
                             const isOpen = expanded === index;
 
                             return (
-                                <div key={user.fid} className="shadow-md bg-white rounded-2xl">
+                                <div key={user.fid + user.joined_at.toString()} className="shadow-md bg-white rounded-2xl">
                                     <button
                                         onClick={() => setExpanded(isOpen ? null : index)}
                                         className="w-full flex justify-between items-center px-4 py-3 font-medium duration-200 rounded-2xl hover:bg-gray-100"
