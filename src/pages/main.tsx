@@ -48,7 +48,7 @@ export default function MainPage() {
         };
     }, [data]);
 
-    const formatChange = (change: number) => `${change > 0 ? "+" : ""}${change.toFixed(1)}%`;
+    const formatChange = (change: number) => `${change > 0 ? "+" : ""}${change.toFixed(2)}%`;
 
     const [expanded, setExpanded] = useState<number | null>(null);
     const [walletFilter, setWalletFilter] = useState<"all" | "external" | "native">("all");
@@ -103,7 +103,7 @@ export default function MainPage() {
                         <h3>Joined Last 7 Days</h3>
                         <div className="flex w-full items-center justify-between">
                             <p className="text-3xl font-bold">{last7d}</p>
-                            <span className={cn("text-xl", last24hChange > 0 ? "text-green-600" : "text-red-500")}>
+                            <span className={cn("text-xl", last7dChange > 0 ? "text-green-600" : "text-red-500")}>
                                 {formatChange(last7dChange)}
                             </span>
                         </div>
@@ -142,7 +142,7 @@ export default function MainPage() {
                             const isOpen = expanded === index;
 
                             return (
-                                <div key={user.fid + user.joined_at.toString()} className="shadow-md bg-white rounded-2xl">
+                                <div key={user.fid} className="shadow-md bg-white rounded-2xl">
                                     <button
                                         onClick={() => setExpanded(isOpen ? null : index)}
                                         className="w-full flex justify-between items-center px-4 py-3 font-medium duration-200 rounded-2xl hover:bg-gray-100"
