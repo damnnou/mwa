@@ -9,7 +9,7 @@ type RawUser = {
     fid: number;
 };
 
-type ParsedUser = Omit<RawUser, "joined_at"> & { joined_at: Date };
+export type ParsedUser = Omit<RawUser, "joined_at"> & { joined_at: Date };
 
 export function useWaitlistData() {
     const { data, isLoading } = useSWR<RawUser[]>(["waitlistData"], async () => {

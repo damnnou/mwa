@@ -2,11 +2,43 @@
 
 import Header from "~/components/Header";
 import { useWaitlistData } from "~/hooks/useWaitlist";
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { cn } from "~/lib/utils";
+import { RegistrationChart } from "~/components/RegistrationChart";
+import { useRouter, useSearchParams } from "next/navigation";
+import { getPageNumbers } from "~/lib/getPageNumbers";
+
+const USERS_PER_PAGE = 50;
 
 export default function MainPage() {
     const { data, isLoading } = useWaitlistData();
+
+    const router = useRouter();
+    const searchParams = useSearchParams();
+
+    // Получаем страницу из url или по умолчанию 1
+    const initialPage = Number(searchParams?.get("page") ?? "1");
+    const [page, setPage] = useState(initialPage > 0 ? initialPage : 1);
+
+    // Если URL параметр изменился, обновляем состояние страницы
+    useEffect(() => {
+        const currentPage = Number(searchParams?.get("page") ?? "1");
+        if (currentPage > 0 && currentPage !== page) {
+            setPage(currentPage);
+        }
+    }, [searchParams]);
+
+    // При смене страницы обновляем URL параметр
+    const setPageAndUpdateURL = (newPage: number) => {
+        if (!searchParams) return;
+        setPage(newPage);
+        // Обновляем URL параметр, сохраняя остальные параметры
+        const params = new URLSearchParams(Array.from(searchParams.entries()));
+        params.set("page", newPage.toString());
+        router.replace(`?${params.toString()}`, { scroll: false });
+    };
+
+    // ... [Твой код по вычислению статистик — оставляем без изменений] ...
 
     const { total, last24h, last24hChange, last7d, last7dChange } = useMemo(() => {
         if (!data) {
@@ -54,6 +86,7 @@ export default function MainPage() {
     const [walletFilter, setWalletFilter] = useState<"all" | "external" | "native">("all");
     const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
 
+    // Отфильтрованные и отсортированные пользователи
     const filteredUsers = useMemo(() => {
         if (!data) return [];
 
@@ -67,6 +100,10 @@ export default function MainPage() {
 
         return sorted;
     }, [data, walletFilter, sortOrder]);
+
+    // Пагинация — вычисляем пользователей текущей страницы
+    const totalPages = Math.ceil(filteredUsers.length / USERS_PER_PAGE);
+    const paginatedUsers = filteredUsers.slice((page - 1) * USERS_PER_PAGE, page * USERS_PER_PAGE);
 
     if (isLoading)
         return (
@@ -110,6 +147,8 @@ export default function MainPage() {
                     </div>
                 </div>
 
+                <RegistrationChart data={data || []} />
+
                 <div className="my-12 w-full">
                     <div className="flex max-lg:flex-col gap-4 items-center justify-between mb-6">
                         <h2 className="text-xl font-bold">Waitlist Users ({filteredUsers.length})</h2>
@@ -138,13 +177,13 @@ export default function MainPage() {
                     </div>
 
                     <div className="flex flex-col gap-4">
-                        {filteredUsers.map((user, index) => {
-                            const isOpen = expanded === index;
+                        {paginatedUsers.map((user, index) => {
+                            const isOpen = expanded === index + (page - 1) * USERS_PER_PAGE;
 
                             return (
                                 <div key={user.fid} className="shadow-md bg-white rounded-2xl">
                                     <button
-                                        onClick={() => setExpanded(isOpen ? null : index)}
+                                        onClick={() => setExpanded(isOpen ? null : index + (page - 1) * USERS_PER_PAGE)}
                                         className="w-full flex justify-between items-center px-4 py-3 font-medium duration-200 rounded-2xl hover:bg-gray-100"
                                     >
                                         <span>{user.username}</span>
@@ -182,6 +221,40 @@ export default function MainPage() {
                                 </div>
                             );
                         })}
+                    </div>
+
+                    <div className="flex justify-center items-center gap-2 mt-8">
+                        <button
+                            disabled={page <= 1}
+                            onClick={() => setPageAndUpdateURL(page - 1)}
+                            className="px-4 py-2 rounded border bg-white max-lg:hidden disabled:opacity-50"
+                        >
+                            Previous
+                        </button>
+
+                        {getPageNumbers(page, totalPages).map((p, idx) =>
+                            p === "..." ? (
+                                <span key={`dots-${idx}`} className="px-3 py-1">
+                                    ...
+                                </span>
+                            ) : (
+                                <button
+                                    key={p}
+                                    onClick={() => setPageAndUpdateURL(p as number)}
+                                    className={cn("px-3 py-1 rounded border", p === page ? "bg-black text-white" : "bg-white text-black")}
+                                >
+                                    {p}
+                                </button>
+                            )
+                        )}
+
+                        <button
+                            disabled={page >= totalPages}
+                            onClick={() => setPageAndUpdateURL(page + 1)}
+                            className="px-4 py-2 rounded border  max-lg:hidden bg-white disabled:opacity-50"
+                        >
+                            Next
+                        </button>
                     </div>
                 </div>
             </div>

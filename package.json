@@ -41,6 +41,7 @@
     "dotenv": "^16.4.7",
     "firebase-admin": "^13.4.0",
     "framer-motion": "^12.16.0",
+    "lightweight-charts": "^5.0.7",
     "lucide-react": "^0.469.0",
     "mipd": "^0.0.7",
     "next": "15.0.3",
