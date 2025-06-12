@@ -10,7 +10,7 @@ export function getPageNumbers(current: number, total: number) {
         }
     }
 
-    for (let i of range) {
+    for (const i of range) {
         if (l !== -1) {
             if (i - l === 2) {
                 rangeWithDots.push(l + 1);
